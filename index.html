@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Verification</title>
+</head>
+<body>
+    <h2>Checking Your Location...</h2>
+    <p id="message">Please allow location access.</p>
+
+    <script>
+        // Approved location (Latitude & Longitude)
+        const allowedLatitude = 6.626955;
+        const allowedLongitude = 3.259378;
+        const allowedRadius = 100; // 🔥 Reduced to 100 meters for strict control
+
+        // Google Form Link
+        const googleFormLink = "https://forms.gle/zq43UrhbJYYFdfA89";
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(checkLocation, showError, { enableHighAccuracy: true });
+            } else {
+                document.getElementById("message").innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function checkLocation(position) {
+            let userLat = position.coords.latitude;
+            let userLng = position.coords.longitude;
+
+            let distance = getDistanceFromLatLonInMeters(userLat, userLng, allowedLatitude, allowedLongitude);
+
+            if (distance <= allowedRadius) {
+                document.getElementById("message").innerHTML = "✅ Access Granted. Redirecting...";
+                setTimeout(() => {
+                    window.location.href = googleFormLink;
+                }, 2000);
+            } else {
+                document.getElementById("message").innerHTML = "❌ Access Denied: You are not in the allowed location.";
+            }
+        }
+
+        function showError(error) {
+            document.getElementById("message").innerHTML = "⚠️ Error retrieving location. Enable GPS and try again.";
+        }
+
+        // Calculate Distance using Haversine formula
+        function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
+            const R = 6371e3; // Earth radius in meters
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // Run location check on page load
+        getLocation();
+    </script>
+</body>
+</html>
