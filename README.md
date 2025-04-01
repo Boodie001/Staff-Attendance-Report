@@ -1,1 +1,1 @@
-![Grooming Centre Logo](https://raw.githubusercontent.com/Boodie001/Staff-Attendance-Report/main/Image%20for%20repo.png)
+![Grooming Centre Logo](https://raw.githubusercontent.com/Boodie001/Staff-Attendance-Report/refs/heads/main/GC%20Logo.png)
