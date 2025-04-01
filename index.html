@@ -3,63 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Verification</title>
+    <title>Location Access Check</title>
 </head>
 <body>
-    <h2>Checking Your Location...</h2>
-    <p id="message">Please allow location access.</p>
+    <h2>Checking your location...</h2>
+    <img id="locationImage" src="https://raw.githubusercontent.com/Boodie001/Staff-Attendance-Report/main/Image%20for%20repo.png" alt="Access Image" width="300" style="display: none;">
+    <p id="status">Verifying your location...</p>
 
     <script>
-        // Approved location (Latitude & Longitude)
-        const allowedLatitude = 6.687829;
-        const allowedLongitude = 3.264912;
-        const allowedRadius = 100; // 🔥 Reduced to 100 meters for strict control
-
-        // Google Form Link
-        const googleFormLink = "https://forms.gle/zq43UrhbJYYFdfA89";
-
         function getLocation() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(checkLocation, showError, { enableHighAccuracy: true });
+                navigator.geolocation.getCurrentPosition(success, error);
             } else {
-                document.getElementById("message").innerHTML = "Geolocation is not supported by this browser.";
+                document.getElementById("status").innerHTML = "Geolocation is not supported by this browser.";
             }
         }
 
-        function checkLocation(position) {
-            let userLat = position.coords.latitude;
-            let userLng = position.coords.longitude;
+        function success(position) {
+            const userLat = position.coords.latitude;
+            const userLng = position.coords.longitude;
 
-            let distance = getDistanceFromLatLonInMeters(userLat, userLng, allowedLatitude, allowedLongitude);
+            // Allowed location
+            const allowedLat = 6.538775;
+            const allowedLng = 3.3040984;
+            const radius = 0.5; // Allowed range in KM
 
-            if (distance <= allowedRadius) {
-                document.getElementById("message").innerHTML = "✅ Access Granted. Redirecting...";
+            if (isWithinRange(userLat, userLng, allowedLat, allowedLng, radius)) {
+                document.getElementById("status").innerHTML = "Access Granted!";
+                document.getElementById("locationImage").style.display = "block"; // Show the image
+
+                // Redirect after 3 seconds
                 setTimeout(() => {
-                    window.location.href = googleFormLink;
-                }, 2000);
+                    window.location.href = "https://forms.gle/zq43UrhbJYYFdfA89";
+                }, 3000);
             } else {
-                document.getElementById("message").innerHTML = "❌ Access Denied: You are not in the allowed location.";
+                document.getElementById("status").innerHTML = "Access Denied! You are not in the allowed location.";
             }
         }
 
-        function showError(error) {
-            document.getElementById("message").innerHTML = "⚠️ Error retrieving location. Enable GPS and try again.";
+        function error() {
+            document.getElementById("status").innerHTML = "Error getting location.";
         }
 
-        // Calculate Distance using Haversine formula
-        function getDistanceFromLatLonInMeters(lat1, lon1, lat2, lon2) {
-            const R = 6371e3; // Earth radius in meters
-            const dLat = (lat2 - lat1) * (Math.PI / 180);
-            const dLon = (lon2 - lon1) * (Math.PI / 180);
+        function isWithinRange(userLat, userLng, allowedLat, allowedLng, radius) {
+            const earthRadius = 6371; // Radius of the Earth in KM
+            const dLat = toRadians(allowedLat - userLat);
+            const dLng = toRadians(allowedLng - userLng);
+
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                Math.cos(toRadians(userLat)) * Math.cos(toRadians(allowedLat)) *
+                Math.sin(dLng / 2) * Math.sin(dLng / 2);
+
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
+            const distance = earthRadius * c; // Distance in KM
+
+            return distance <= radius;
         }
 
-        // Run location check on page load
-        getLocation();
+        function toRadians(degrees) {
+            return degrees * (Math.PI / 180);
+        }
+
+        // Run when the page loads
+        window.onload = getLocation;
     </script>
 </body>
 </html>
