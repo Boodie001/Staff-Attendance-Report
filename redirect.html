@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirecting...</title>
+</head>
+<body>
+  <h2>Verifying access source...</h2>
+  <p id="message">Checking referrer...</p>
+
+  <script>
+    const allowedReferrer = "https://boodie001.github.io/Staff-Attendance-Report/";
+    const formURL = "https://forms.gle/zq43UrhbJYYFdfA89";
+
+    const ref = document.referrer;
+    const msg = document.getElementById("message");
+
+    if (ref.startsWith(allowedReferrer)) {
+      msg.innerText = "Access verified. Redirecting to form...";
+      setTimeout(() => {
+        window.location.href = formURL;
+      }, 2000);
+    } else {
+      msg.innerText = "Access denied. Please access the form from the official GitHub page.";
+    }
+  </script>
+</body>
+</html>
