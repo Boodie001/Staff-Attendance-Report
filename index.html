@@ -26,7 +26,7 @@
       // Allowed location
       const allowedLat = 6.538842;
       const allowedLng = 3.303937;
-      const radius = 0.5; // KM
+      const radius = 0.1; // KM
 
       if (isWithinRange(userLat, userLng, allowedLat, allowedLng, radius)) {
         document.getElementById("status").innerHTML = "Access Granted!";
